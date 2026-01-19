@@ -11,8 +11,10 @@ import {
   Layout, 
   Empty,
   Popconfirm,
-  message
+  message,
+  Dropdown
 } from 'antd';
+import type { MenuProps } from 'antd';
 import { 
   SendOutlined, 
   SaveOutlined,
@@ -20,7 +22,8 @@ import {
   RocketOutlined,
   PlusOutlined,
   HistoryOutlined,
-  CopyOutlined
+  CopyOutlined,
+  MoreOutlined
 } from '@ant-design/icons';
 import { Resizable } from 're-resizable';
 import api from '../../api';
@@ -653,85 +656,92 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
     <Layout style={{ height: '100%', background: '#fff', display: 'flex', flexDirection: 'column' }}>
       
       {/* 1. Top Bar */}
-      <div style={{ padding: '12px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ padding: '16px 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', flexDirection: 'column', gap: 16 }}>
         
-        {/* Title Input */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Space.Compact style={{ width: '100%', maxWidth: 600 }}>
-                <Button disabled size="large" style={{ cursor: 'default', background: '#fafafa', color: '#000000d9', borderColor: '#d9d9d9' }}>API Name</Button>
-                <Input 
-                    value={title} 
-                    onChange={e => setTitle(e.target.value)} 
-                    placeholder="Enter API Name" 
-                    disabled={isViewer || isCase}
-                    size="large"
-                />
-            </Space.Compact>
+        {/* Row 1: Title + Tags */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ flex: '2 1 400px', minWidth: 300, maxWidth: 800 }}>
+                <Space.Compact style={{ width: '100%' }}>
+                    <Button disabled size="large" style={{ cursor: 'default', background: '#fafafa', color: '#000000d9', borderColor: '#d9d9d9' }}>Name</Button>
+                    <Input 
+                        value={title} 
+                        onChange={e => setTitle(e.target.value)} 
+                        placeholder="Enter API Name" 
+                        disabled={isViewer || isCase}
+                        size="large"
+                    />
+                </Space.Compact>
+            </div>
             {!isCase && (
-                <Select
-                    mode="tags"
-                    style={{ flex: 1, maxWidth: 400 }}
-                    placeholder="Tags (e.g. Auth, User)"
-                    value={tags}
-                    onChange={setTags}
-                    disabled={isViewer}
-                    size="large"
-                    tokenSeparators={[',']}
-                />
+                <div style={{ flex: '3 1 500px', minWidth: 300 }}>
+                    <Select
+                        mode="tags"
+                        style={{ width: '100%' }}
+                        placeholder="Tags (e.g. Auth, User)"
+                        value={tags}
+                        onChange={setTags}
+                        disabled={isViewer}
+                        size="large"
+                        tokenSeparators={[',']}
+                    />
+                </div>
             )}
             {isCase && <Tag color="orange" style={{ fontSize: 14, padding: '4px 12px' }}>TEST CASE</Tag>}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ flex: 1, display: 'flex' }}>
-            <Space.Compact style={{ width: '100%' }}>
-                <Select 
-                    value={method} 
-                    onChange={setMethod} 
-                    style={{ width: 100 }}
-                    size="large"
-                    variant="filled"
-                    disabled={isViewer}
-                >
-                    <Option value="GET"><Text type="success">GET</Text></Option>
-                    <Option value="POST"><Text type="warning">POST</Text></Option>
-                    <Option value="PUT"><Text style={{ color: '#1890ff' }}>PUT</Text></Option>
-                    <Option value="DELETE"><Text type="danger">DELETE</Text></Option>
-                </Select>
-                <Input 
-                    placeholder="Enter request URL" 
-                    value={url}
-                    onChange={e => setUrl(e.target.value)}
-                    size="large"
-                    disabled={isViewer}
-                />
-            </Space.Compact>
-        </div>
-        <Space>
-            <Button 
-                type="primary" 
-                icon={<SendOutlined />} 
-                onClick={handleSend}
-                loading={loading}
-                size="large"
-                style={{ background: '#722ed1', borderColor: '#722ed1', padding: '0 30px' }}
-            >
-                Send
-            </Button>
-            {!isViewer && (
-                <>
-                    <Button icon={<CopyOutlined />} size="large" onClick={handleCopyCurl}>Copy cURL</Button>
-                    <Button icon={<SaveOutlined />} size="large" onClick={handleSaveInternal}>Save</Button>
-                    <Button icon={<HistoryOutlined />} size="large" onClick={onHistory} />
-                    <Button icon={<PlusOutlined />} size="large" onClick={handleSaveAsCase}>Save as Case</Button>
-                    {apiData && onDelete && (
-                        <Popconfirm title={isCase ? "Delete this Case?" : "Delete this API?"} onConfirm={onDelete}>
-                            <Button icon={<DeleteOutlined />} size="large" danger />
-                        </Popconfirm>
+        {/* Row 2: Method + URL + Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 600px', display: 'flex', minWidth: 600 }}>
+                <Space.Compact style={{ width: '100%' }}>
+                    <Select 
+                        value={method} 
+                        onChange={setMethod} 
+                        style={{ width: 100, minWidth: 100 }}
+                        size="large"
+                        variant="filled"
+                        disabled={isViewer}
+                    >
+                        <Option value="GET"><Text type="success">GET</Text></Option>
+                        <Option value="POST"><Text type="warning">POST</Text></Option>
+                        <Option value="PUT"><Text style={{ color: '#1890ff' }}>PUT</Text></Option>
+                        <Option value="DELETE"><Text type="danger">DELETE</Text></Option>
+                    </Select>
+                    <Input 
+                        placeholder="Enter request URL" 
+                        value={url}
+                        onChange={e => setUrl(e.target.value)}
+                        size="large"
+                        disabled={isViewer}
+                    />
+                </Space.Compact>
+            </div>
+            <div style={{ flex: '0 0 auto' }}>
+                <Space wrap>
+                    <Button 
+                        type="primary" 
+                        icon={<SendOutlined />} 
+                        onClick={handleSend}
+                        loading={loading}
+                        size="large"
+                        style={{ background: '#722ed1', borderColor: '#722ed1', padding: '0 30px' }}
+                    >
+                        Send
+                    </Button>
+                    {!isViewer && (
+                        <>
+                            <Button icon={<CopyOutlined />} size="large" onClick={handleCopyCurl}>Copy cURL</Button>
+                            <Button icon={<SaveOutlined />} size="large" onClick={handleSaveInternal}>Save</Button>
+                            <Button icon={<HistoryOutlined />} size="large" onClick={onHistory} />
+                            <Button icon={<PlusOutlined />} size="large" onClick={handleSaveAsCase}>Save as Case</Button>
+                            {apiData && onDelete && (
+                                <Popconfirm title={isCase ? "Delete this Case?" : "Delete this API?"} onConfirm={onDelete}>
+                                    <Button icon={<DeleteOutlined />} size="large" danger />
+                                </Popconfirm>
+                            )}
+                        </>
                     )}
-                </>
-            )}
-        </Space>
+                </Space>
+            </div>
         </div>
       </div>
 

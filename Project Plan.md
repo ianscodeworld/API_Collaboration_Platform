@@ -70,70 +70,72 @@ To build a Postman/Apifox-style API life-cycle management platform specifically 
 
 ---
 
-## 5. Phase 2: UX Enhancements (Immediate Focus)
+## 5. Phase 2: UX Enhancements (Completed)
 
-### 5.1 Smart Environment Import & Conflict Resolution
-**Goal:** Prevent broken APIs when copying them between workspaces by ensuring required environment variables exist in the destination.
+### 5.1 Smart Environment Import & Conflict Resolution (Done)
+- Detects missing variables, allows Environment Cloning.
 
-*   **Implementation Steps:**
-    1.  **Frontend Analysis:** Update `WorkspaceDetail.tsx` -> `handleCopyApis`.
-        *   Before sending copy request: Scan selected API content strings for `{{variable_name}}` patterns.
-        *   Fetch target workspace environments.
-        *   Compare required variables vs. available variables in target.
-    2.  **Conflict UI:**
-        *   If missing variables found: Show a "Missing Environment Variables" Modal.
-        *   Option A: "Copy anyway (will break)."
-        *   Option B: "Import Environment Config from Source."
-    3.  **Environment Import Feature:**
-        *   Add "Export Environment" (JSON) and "Import Environment" buttons in `EnvironmentManager`.
-        *   Allow deep-copying an Environment from one workspace to another via a new API endpoint or frontend orchestration.
+### 5.2 Docs Revolution: Code Generation (Done)
+- Multi-language tabs (Java, JS, Python).
 
-### 5.2 Docs Revolution: Code Generation
-**Goal:** Replace the single "Copy cURL" button with a multi-language code generation tab (JS, Python, Java) to make the Docs more useful for developers.
+### 5.3 API Tags & Grouping (Done)
+- Tag management, Sidebar grouping, Docs badges.
 
-*   **Implementation Steps:**
-    1.  **Frontend Components:** Create `CodeGenerator.tsx` component.
-    2.  **Logic:** Implement string template generators for:
-        *   **JavaScript:** `fetch` with headers/body.
-        *   **Python:** `requests.request` with dictionary payloads.
-        *   **Java:** `OkHttp` Request builder.
-    3.  **UI Update:** Replace the bottom "Code Generation" card in `Documentation.tsx` with a Tabs component containing the new languages + cURL.
-
-### 5.3 API Tags & Grouping
-**Goal:** Implement "Tags" to allow logical grouping of APIs (e.g., "User Management", "Orders") in both the Sidebar and Documentation, improving navigation.
-
-*   **Implementation Steps:**
-    1.  **Data Model:**
-        *   Update `ApiDefinition` (frontend state & backend DTO) to include a `tags: string[]` field in the JSON content.
-    2.  **Debugger UI:**
-        *   Add a "Tags" input (Select with mode="tags") in `ApiDebugger.tsx` header (near API Name).
-    3.  **Sidebar Update:**
-        *   Update `WorkspaceDetail.tsx` -> `treeData` generation logic.
-        *   Add a toggle: "View by Folder" (current) vs "View by Tag".
-        *   If "View by Tag": Group APIs under Tag nodes. APIs with multiple tags appear under multiple nodes.
-    4.  **Docs Update:**
-        *   Display Tags as colored badges in `Documentation.tsx`.
+### 5.4 Multi-Tab Interface (Done)
+- Tab bar for multiple open APIs, state preservation.
 
 ---
 
-## 6. Phase 3: Advanced UX Architecture (Backlog)
+## 6. Phase 3: Integration & Advanced UX (Next Steps)
 
-### 6.1 Multi-Tab Interface
-**Goal:** Enable developers to work on multiple APIs simultaneously (Postman-style) instead of constantly switching contexts.
+### 6.1 Swagger/OpenAPI Import (High Priority)
+**Goal:** Enable importing existing Swagger/OpenAPI specifications to quickly populate workspaces.
 
-*   **Requirement:** Refactor `WorkspaceDetail.tsx` state from single `selectedApiId` to `activeTabs` array.
-*   **State Management:** Persist open tabs in `Zustand` or LocalStorage to survive reloads.
-*   **UX:** Add a Tab bar above the `ApiDebugger` view.
+*   **Implementation Steps:**
+    1.  **Frontend Parsing:** Integrate `swagger-parser` or similar lightweight library.
+    2.  **Mapping:** Map OpenAPI paths, verbs, parameters, and bodies to the `ApiDefinition` JSON structure.
+    3.  **UI:** Add "Import OpenAPI" option to the sidebar Import menu. Support file upload (`.json`, `.yaml`) and URL import.
 
-### 6.2 Drag-and-Drop Ordering
-**Goal:** Allow users to manually reorder APIs and Folders in the sidebar.
+### 6.2 Comments System (Team Collaboration)
+**Goal:** Allow users to discuss specific APIs or parameters directly within the interface.
 
-*   **Requirement:** Add `orderIndex` field to `ApiDefinition` entity.
-*   **Backend:** Endpoint to batch update `orderIndex` for multiple IDs.
-*   **Frontend:** Enable `draggable` on Ant Design Tree component and handle drop events.
+*   **Implementation Steps:**
+    1.  **Backend:** Create `Comment` entity (`apiId`, `fieldPath`, `content`, `userId`, `resolved`, `createdAt`).
+    2.  **API:** Endpoints for `POST /comments`, `GET /comments/{apiId}`, `PUT /comments/{id}/resolve`.
+    3.  **Frontend:**
+        *   Add a "Comments" side drawer or float button in `ApiDebugger`.
+        *   (Advanced) Allow clicking a parameter row to add a comment linked to that field (`fieldPath`).
+    4.  **Real-time:** Broadcast new comments via WebSocket.
 
-### 6.3 Global Search (Command Palette)
-**Goal:** "Cmd+K" / "Ctrl+K" quick navigation to jump to any API or Workspace.
+### 6.3 Advanced UX Suite (The "Polish")
 
-*   **Requirement:** A global modal invoked by hotkey.
-*   **Scope:** Search across API Titles, Workspace Names, and Environment Keys.
+#### 6.3.1 Response Visualizer
+*   **Goal:** Better rendering for HTML/Image responses and binary file handling.
+*   **Implementation:** 
+    *   Add Tabs to Response area: `Preview` (iframe), `Raw` (text), `Image` (img tag).
+    *   **Binary Handling:** Detect `Content-Type` (PDF, Excel, Zip). If binary, prevent text rendering and show a "Download File" button with size info. Support PDF preview via `<embed>`.
+
+#### 6.3.2 Global Command Palette (Ctrl+K)
+*   **Goal:** Rapid navigation.
+*   **Implementation:**
+    *   Global key listener for `Ctrl/Cmd + K`.
+    *   Modal with fuzzy search (fuse.js) across all APIs and Workspaces.
+    *   Selecting an item navigates to it or opens it in a new tab.
+
+#### 6.3.3 Smart Paste (cURL Detection)
+*   **Goal:** Seamless import workflow.
+*   **Implementation:**
+    *   Global `onPaste` listener in `WorkspaceDetail`.
+    *   Regex check: If text starts with `curl `, prompt "Import cURL?".
+    *   If confirmed, parse and open in new tab.
+
+#### 6.3.4 Path Parameter Extraction
+*   **Goal:** Auto-fill parameters from URL.
+*   **Implementation:**
+    *   Listen to URL Input `onChange`.
+    *   Regex match `:variable` or `{variable}`.
+    *   Automatically add/update entries in the `Params` table.
+
+#### 6.3.5 Layout Customization
+*   **Goal:** Support different screen sizes and workflows.
+*   **Implementation:** Add a "Layout" toggle button to switch Request/Response view from "Top/Bottom" (Vertical Split) to "Left/Right" (Horizontal Split).
