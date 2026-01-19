@@ -22,12 +22,14 @@ import Documentation from './Documentation';
 import EnvironmentManager from './EnvironmentManager';
 import VersionHistory from './VersionHistory';
 import RequestHistoryList from './RequestHistoryList';
+import ImportConflictModal from './ImportConflictModal';
 import { useSocket } from '../../store/useSocket';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useEnvStore } from '../../store/useEnvStore';
 import type { Environment } from '../../store/useEnvStore';
 import { AppstoreOutlined, HistoryOutlined } from '@ant-design/icons';
 import { parseCurl } from '../../utils/curlParser';
+import { getRequiredVariablesForApi } from '../../utils/variableUtils';
 
 const { Sider, Content, Header } = Layout;
 const Text = Typography.Text;
@@ -60,6 +62,10 @@ const WorkspaceDetail: React.FC = () => {
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [form] = Form.useForm();
+  
+  // Conflict State
+  const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
+  const [missingVars, setMissingVars] = useState<string[]>([]);
   
   const { role } = useAuthStore();
   const isViewer = role === 'VIEWER';
@@ -97,7 +103,6 @@ const WorkspaceDetail: React.FC = () => {
           return;
       }
       
-      // Extract ID with regex to handle complex keys like api-123-tagname
       const apiIdsToCopy = Array.from(new Set(checkedKeys
         .filter(k => k.toString().startsWith('api-'))
         .map(k => {
@@ -111,10 +116,59 @@ const WorkspaceDetail: React.FC = () => {
           return;
       }
 
-      const hide = message.loading(`Copying ${apiIdsToCopy.length} APIs...`, 0);
+      // 1. Scan for variables
+      const requiredVars = new Set<string>();
+      apiIdsToCopy.forEach(apiId => {
+          const apiDef = apis.find(a => a.id === apiId);
+          if (apiDef) {
+              getRequiredVariablesForApi(apiDef.content).forEach(v => requiredVars.add(v));
+          }
+      });
+
+      if (requiredVars.size > 0) {
+          // 2. Fetch target workspace environments
+          try {
+              const targetEnvsRes = await api.get(`/environments/workspace/${targetWorkspaceId}`);
+              const targetEnvs = targetEnvsRes.data;
+              
+              // 3. Find missing variables
+              const availableInTarget = new Set<string>();
+              targetEnvs.forEach((env: any) => {
+                  try {
+                      const vars = JSON.parse(env.variables || '[]');
+                      vars.forEach((v: any) => availableInTarget.add(v.key));
+                  } catch(e) {}
+              });
+
+              const missing = Array.from(requiredVars).filter(v => !availableInTarget.has(v));
+              
+              if (missing.length > 0) {
+                  setMissingVars(missing);
+                  setIsConflictModalOpen(true);
+                  return; // Stop here, modal will handle next steps
+              }
+          } catch (e) {
+              console.error("Failed to check target environments", e);
+          }
+      }
+
+      // If no missing vars or check failed, proceed with copy
+      executeCopy(apiIdsToCopy);
+  };
+
+  const executeCopy = async (apiIds?: number[]) => {
+      const ids = apiIds || Array.from(new Set(checkedKeys
+        .filter(k => k.toString().startsWith('api-'))
+        .map(k => {
+            const match = k.toString().match(/^api-(\d+)/);
+            return match ? Number(match[1]) : 0;
+        })
+        .filter(id => id !== 0)));
+
+      const hide = message.loading(`Copying ${ids.length} APIs...`, 0);
       let successCount = 0;
 
-      for (const apiId of apiIdsToCopy) {
+      for (const apiId of ids) {
           const apiDef = apis.find(a => a.id === apiId);
           if (apiDef) {
               try {
@@ -133,6 +187,7 @@ const WorkspaceDetail: React.FC = () => {
       hide();
       message.success(`Successfully copied ${successCount} APIs`);
       setIsCopyModalOpen(false);
+      setIsConflictModalOpen(false);
       setTargetWorkspaceId(null);
       setCheckedKeys([]);
   };
@@ -902,6 +957,15 @@ const WorkspaceDetail: React.FC = () => {
             style={{ fontFamily: 'monospace' }}
         />
       </Modal>
+
+      <ImportConflictModal
+        open={isConflictModalOpen}
+        onClose={() => setIsConflictModalOpen(false)}
+        onConfirm={executeCopy}
+        missingVariables={missingVars}
+        sourceWorkspaceId={Number(id)}
+        targetWorkspaceId={targetWorkspaceId || 0}
+      />
     </Layout>
   );
 };
