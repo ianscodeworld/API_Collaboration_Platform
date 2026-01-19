@@ -1,6 +1,7 @@
 import React from 'react';
-import { Typography, Table, Tag, Card, Divider, Button, message } from 'antd';
+import { Typography, Table, Tag, Card, Divider, Button, message, Tabs } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
+import { generateCurl, generateJavascript, generatePython, generateJava } from '../../utils/codeGenerators';
 
 const { Title, Text } = Typography;
 
@@ -16,27 +17,6 @@ const Documentation: React.FC<Props> = ({ apiData }) => {
     content = JSON.parse(apiData.content || '{}');
   } catch (e) {}
 
-  const generateCurl = () => {
-    let curl = `curl --location --request ${content.method || 'GET'} '${content.url || ''}'`;
-    
-    // Headers
-    if (content.headers) {
-      content.headers.forEach((h: any) => {
-        if (h.key && h.enabled) curl += ` \
---header '${h.key}: ${h.value}'`;
-      });
-    }
-
-    // Body
-    if (content.bodyType === 'json' && content.bodyContent) {
-      // Simple escape for single quotes in curl command
-      const escapedBody = content.bodyContent.replace(/'/g, "'\\''");
-      curl += ` \\\n--data-raw '${escapedBody}'`;
-    }
-
-    return curl;
-  };
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     message.success('Copied to clipboard');
@@ -48,9 +28,24 @@ const Documentation: React.FC<Props> = ({ apiData }) => {
     { title: 'Description', dataIndex: 'description', key: 'description' },
   ];
 
+  const codeItems = [
+    { label: 'cURL', key: 'curl', generator: generateCurl },
+    { label: 'JavaScript', key: 'javascript', generator: generateJavascript },
+    { label: 'Python', key: 'python', generator: generatePython },
+    { label: 'Java', key: 'java', generator: generateJava },
+  ];
+
   return (
     <div style={{ padding: '24px 40px', maxWidth: 1000, margin: '0 auto' }}>
       <Title level={2}>{apiData.title}</Title>
+      
+      {content.tags && content.tags.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          {content.tags.map((tag: string) => (
+            <Tag key={tag} color="blue" style={{ borderRadius: 12 }}>{tag}</Tag>
+          ))}
+        </div>
+      )}
       
       <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
         <Tag color={content.method === 'POST' ? 'orange' : 'green'} style={{ fontSize: 16, padding: '4px 12px' }}>
@@ -92,13 +87,32 @@ const Documentation: React.FC<Props> = ({ apiData }) => {
 
       <Divider />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>Code Generation</Title>
-        <Button icon={<CopyOutlined />} onClick={() => copyToClipboard(generateCurl())}>Copy cURL</Button>
-      </div>
-      <Card size="small" style={{ background: '#1e1e1e', color: '#fff' }}>
-        <pre style={{ margin: 0, overflow: 'auto' }}>{generateCurl()}</pre>
-      </Card>
+      <Title level={4}>Code Generation</Title>
+      <Tabs 
+        type="card"
+        items={codeItems.map(item => {
+            const code = item.generator(content);
+            return {
+                label: item.label,
+                key: item.key,
+                children: (
+                    <div style={{ position: 'relative' }}>
+                        <Button 
+                            icon={<CopyOutlined />} 
+                            size="small" 
+                            style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}
+                            onClick={() => copyToClipboard(code)}
+                        >
+                            Copy
+                        </Button>
+                        <Card size="small" style={{ background: '#1e1e1e', color: '#fff' }}>
+                            <pre style={{ margin: 0, overflow: 'auto', maxHeight: 400 }}>{code}</pre>
+                        </Card>
+                    </div>
+                )
+            };
+        })}
+      />
     </div>
   );
 };

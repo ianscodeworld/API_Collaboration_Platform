@@ -71,124 +71,133 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
 
   const [title, setTitle] = useState('');
 
-  const [method, setMethod] = useState('GET');
+    const [method, setMethod] = useState('GET');
 
-  const [url, setUrl] = useState('');
+    const [url, setUrl] = useState('');
 
-  const [loading, setLoading] = useState(false);
+    const [tags, setTags] = useState<string[]>([]);
+
+    const [loading, setLoading] = useState(false);
 
   
 
-  // Request Data
+    // Request Data
 
-  const [queryParams, setQueryParams] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
+    const [queryParams, setQueryParams] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
 
-  const [headers, setHeaders] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
+    const [headers, setHeaders] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
 
-  const [bodyType, setBodyType] = useState('json');
+    const [bodyType, setBodyType] = useState('json');
 
-  const [bodyContent, setBodyContent] = useState(`{
+    const [bodyContent, setBodyContent] = useState(`{
 
-	
+  	
 
-}`);
+  }`);
 
+  
 
+    // Response Data
 
-  // Response Data
+    const [response, setResponse] = useState<any>(null);
 
-  const [response, setResponse] = useState<any>(null);
+    const [responseMeta, setResponseMeta] = useState<{ status: number; time: number; size: string } | null>(null);
 
-  const [responseMeta, setResponseMeta] = useState<{ status: number; time: number; size: string } | null>(null);
+  
 
+    // --- Effects ---
 
+    useEffect(() => {
 
-  // --- Effects ---
+      if (apiData) {
 
-  useEffect(() => {
+        setTitle(apiData.title || 'Untitled API');
 
-    if (apiData) {
-      setTitle(apiData.title || 'Untitled API');
+        if (apiData.content) {
 
-      if (apiData.content) {
+          try {
 
-        try {
+            const content = JSON.parse(apiData.content);
 
-          const content = JSON.parse(apiData.content);
+            setMethod(content.method || 'GET');
 
-          setMethod(content.method || 'GET');
+            setUrl(content.url || '');
 
-          setUrl(content.url || '');
+            setTags(content.tags || []);
 
-          const qp = content.queryParams || [];
-          setQueryParams(qp.length > 0 ? qp : [{ id: Math.floor(Math.random() * 1000000000), key: '', value: '', type: 'string', description: '', enabled: true }]);
+            const qp = content.queryParams || [];
 
-          const hd = content.headers || [];
-          setHeaders(hd.length > 0 ? hd : [{ id: Math.floor(Math.random() * 1000000000), key: '', value: '', type: 'string', description: '', enabled: true }]);
+            setQueryParams(qp.length > 0 ? qp : [{ id: Math.floor(Math.random() * 1000000000), key: '', value: '', type: 'string', description: '', enabled: true }]);
 
-          setBodyType(content.bodyType || 'json');
+            const hd = content.headers || [];
 
-          setBodyContent(content.bodyContent || '');
+            setHeaders(hd.length > 0 ? hd : [{ id: Math.floor(Math.random() * 1000000000), key: '', value: '', type: 'string', description: '', enabled: true }]);
 
-        } catch (e) {
+            setBodyType(content.bodyType || 'json');
 
-          console.error("Failed to parse API content", e);
+            setBodyContent(content.bodyContent || '');
+
+          } catch (e) {
+
+            console.error("Failed to parse API content", e);
+
+          }
+
+        } else {
+
+            // New/Empty content
+
+            setMethod('GET');
+
+            setUrl('');
+
+            setTags([]);
 
         }
 
-      } else {
+      } 
 
-          // New/Empty content
+      // Clear response when switching APIs
 
-          setMethod('GET');
+      setResponse(null);
 
-          setUrl('');
+      setResponseMeta(null);
 
-      }
+    }, [apiData]);
 
-    } 
+  
 
-    // Clear response when switching APIs
+    // --- Handlers ---
 
-    setResponse(null);
+    const handleSaveInternal = () => {
 
-    setResponseMeta(null);
+        const content = {
 
-  }, [apiData]);
+            method,
 
+            url,
 
+            tags,
 
-  // --- Handlers ---
+            queryParams,
 
-  const handleSaveInternal = () => {
+            headers,
 
-      const content = {
+            bodyType,
 
-          method,
+            bodyContent
 
-          url,
+        };
 
-          queryParams,
+  
 
-          headers,
+        if (onSave) {
 
-          bodyType,
+            onSave({ title, content });
 
-          bodyContent
+        }
 
-      };
-
-      
-
-
-
-      if (onSave) {
-
-          onSave({ title, content });
-
-      }
-
-  };
+    };
 
   const generateCurl = () => {
     let curl = `curl --location --request ${method} '${url}'`;
@@ -654,6 +663,18 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                     size="large"
                 />
             </Space.Compact>
+            {!isCase && (
+                <Select
+                    mode="tags"
+                    style={{ flex: 1, maxWidth: 400 }}
+                    placeholder="Tags (e.g. Auth, User)"
+                    value={tags}
+                    onChange={setTags}
+                    disabled={isViewer}
+                    size="large"
+                    tokenSeparators={[',']}
+                />
+            )}
             {isCase && <Tag color="orange" style={{ fontSize: 14, padding: '4px 12px' }}>TEST CASE</Tag>}
         </div>
 
@@ -698,22 +719,7 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                     <Button icon={<CopyOutlined />} size="large" onClick={handleCopyCurl}>Copy cURL</Button>
                     <Button icon={<SaveOutlined />} size="large" onClick={handleSaveInternal}>Save</Button>
                     <Button icon={<HistoryOutlined />} size="large" onClick={onHistory} />
-                    <Button icon={<PlusOutlined />} size="large" onClick={() => {
-                        const name = prompt('Case Name:');
-                        if (name && onSaveCase) {
-                            onSaveCase({
-                                name,
-                                content: JSON.stringify({
-                                    method,
-                                    url,
-                                    queryParams,
-                                    headers,
-                                    bodyType,
-                                    bodyContent
-                                })
-                            });
-                        }
-                    }}>Save as Case</Button>
+                    <Button icon={<PlusOutlined />} size="large" onClick={handleSaveAsCase}>Save as Case</Button>
                     {apiData && onDelete && (
                         <Popconfirm title={isCase ? "Delete this Case?" : "Delete this API?"} onConfirm={onDelete}>
                             <Button icon={<DeleteOutlined />} size="large" danger />

@@ -1,18 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { Layout, Tree, Button, Modal, Form, Input, message, Typography, Select, Space, Segmented } from 'antd';
-import { 
-  PlusOutlined, 
-  FileTextOutlined, 
-  SettingOutlined, 
-  EyeOutlined, 
-  CodeOutlined,
   ImportOutlined,
   ExportOutlined,
-  CopyOutlined
+  CopyOutlined,
+  TagOutlined,
+  FolderOutlined
 } from '@ant-design/icons';
 import { Resizable } from 're-resizable';
-import { Dropdown } from 'antd';
+import { Dropdown, Switch } from 'antd';
 import type { MenuProps } from 'antd';
 import api from '../../api';
 import ApiDebugger from './ApiDebugger';
@@ -53,6 +46,7 @@ const WorkspaceDetail: React.FC = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'debug' | 'docs'>('debug');
   const [sidebarTab, setSidebarTab] = useState<'apis' | 'history'>('apis');
+  const [viewByTag, setViewByTag] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [environments, setEnvironments] = useState<Environment[]>([]);
@@ -94,9 +88,14 @@ const WorkspaceDetail: React.FC = () => {
           return;
       }
       
-      const apiIdsToCopy = checkedKeys
+      // Extract ID with regex to handle complex keys like api-123-tagname
+      const apiIdsToCopy = Array.from(new Set(checkedKeys
         .filter(k => k.toString().startsWith('api-'))
-        .map(k => Number(k.toString().replace('api-', '')));
+        .map(k => {
+            const match = k.toString().match(/^api-(\d+)/);
+            return match ? Number(match[1]) : 0;
+        })
+        .filter(id => id !== 0)));
 
       if (apiIdsToCopy.length === 0) {
           message.warning("No APIs selected to copy");
@@ -312,19 +311,90 @@ const WorkspaceDetail: React.FC = () => {
   };
   const [historySelection, setHistorySelection] = useState<any>(null);
 
-  const treeData = apis.map(apiDef => ({
-    title: apiDef.title,
-    key: `api-${apiDef.id}`,
-    icon: <FileTextOutlined />,
-    children: (testCases[apiDef.id] || []).map(tc => ({
-        title: tc.name,
-        key: `case-${apiDef.id}-${tc.id}`,
-        isCase: true,
-        apiId: apiDef.id,
-        caseId: tc.id,
-        icon: <EyeOutlined style={{ color: '#faad14' }} />,
-    }))
-  }));
+  const getTreeData = () => {
+    if (!viewByTag) {
+        return apis.map(apiDef => ({
+            title: apiDef.title,
+            key: `api-${apiDef.id}`,
+            icon: <FileTextOutlined />,
+            apiId: apiDef.id,
+            children: (testCases[apiDef.id] || []).map(tc => ({
+                title: tc.name,
+                key: `case-${apiDef.id}-${tc.id}`,
+                isCase: true,
+                apiId: apiDef.id,
+                caseId: tc.id,
+                icon: <EyeOutlined style={{ color: '#faad14' }} />,
+            }))
+        }));
+    }
+
+    const tagMap: Record<string, ApiDef[]> = {};
+    const uncategorized: ApiDef[] = [];
+
+    apis.forEach(apiDef => {
+        let content: any = {};
+        try { content = JSON.parse(apiDef.content); } catch (e) {}
+        const tags = content.tags || [];
+        
+        if (!tags || tags.length === 0) {
+            uncategorized.push(apiDef);
+        } else {
+            tags.forEach((tag: string) => {
+                if (!tagMap[tag]) tagMap[tag] = [];
+                tagMap[tag].push(apiDef);
+            });
+        }
+    });
+
+    const nodes = Object.entries(tagMap).sort((a, b) => a[0].localeCompare(b[0])).map(([tag, apiList]) => ({
+        title: tag,
+        key: `tag-${tag}`,
+        selectable: false,
+        icon: <TagOutlined />,
+        children: apiList.map(apiDef => ({
+            title: apiDef.title,
+            key: `api-${apiDef.id}-${tag}`, // Unique key for duplicates
+            icon: <FileTextOutlined />,
+            apiId: apiDef.id,
+            children: (testCases[apiDef.id] || []).map(tc => ({
+                title: tc.name,
+                key: `case-${apiDef.id}-${tc.id}-${tag}`,
+                isCase: true,
+                apiId: apiDef.id,
+                caseId: tc.id,
+                icon: <EyeOutlined style={{ color: '#faad14' }} />,
+            }))
+        }))
+    }));
+
+    if (uncategorized.length > 0) {
+        nodes.push({
+            title: 'Uncategorized',
+            key: 'tag-uncategorized',
+            selectable: false,
+            icon: <FolderOutlined />,
+            children: uncategorized.map(apiDef => ({
+                title: apiDef.title,
+                key: `api-${apiDef.id}-uncat`,
+                icon: <FileTextOutlined />,
+                apiId: apiDef.id,
+                children: (testCases[apiDef.id] || []).map(tc => ({
+                    title: tc.name,
+                    key: `case-${apiDef.id}-${tc.id}-uncat`,
+                    isCase: true,
+                    apiId: apiDef.id,
+                    caseId: tc.id,
+                    icon: <EyeOutlined style={{ color: '#faad14' }} />,
+                }))
+            }))
+        });
+    }
+    
+    return nodes;
+  };
+
+  const treeData = getTreeData();
 
   const onSelectNode = (keys: any[], info: any) => {
       if (keys.length === 0) return;
@@ -334,11 +404,10 @@ const WorkspaceDetail: React.FC = () => {
           setSelectedApiId(node.apiId);
           setSelectedCaseId(node.caseId);
           fetchCases(node.apiId);
-      } else {
-          const apiId = Number(keys[0].replace('api-', ''));
-          setSelectedApiId(apiId);
+      } else if (node.apiId) {
+          setSelectedApiId(node.apiId);
           setSelectedCaseId(null);
-          fetchCases(apiId);
+          fetchCases(node.apiId);
       }
   };
 
@@ -496,7 +565,11 @@ const WorkspaceDetail: React.FC = () => {
         const checkedApiIds = new Set(
             checkedKeys
                 .filter(k => k.toString().startsWith('api-'))
-                .map(k => Number(k.toString().replace('api-', '')))
+                .map(k => {
+                    const match = k.toString().match(/^api-(\d+)/);
+                    return match ? Number(match[1]) : 0;
+                })
+                .filter(id => id !== 0)
         );
         
         // If specific APIs are selected, filter. 
@@ -649,6 +722,20 @@ const WorkspaceDetail: React.FC = () => {
                       value={sidebarTab}
                       onChange={(v) => setSidebarTab(v as any)}
                   />
+                  {sidebarTab === 'apis' && (
+                      <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <Space size="small">
+                              <Text type="secondary" style={{ fontSize: 12 }}>Group by:</Text>
+                              <Switch 
+                                  checkedChildren="Tags" 
+                                  unCheckedChildren="List" 
+                                  checked={viewByTag} 
+                                  onChange={setViewByTag} 
+                                  size="small" 
+                              />
+                          </Space>
+                      </div>
+                  )}
               </div>
               
               {sidebarTab === 'apis' ? (
@@ -696,7 +783,7 @@ const WorkspaceDetail: React.FC = () => {
                           checkable
                           checkedKeys={checkedKeys}
                           onCheck={onCheck as any}
-                          treeData={treeData}
+                          treeData={getTreeData()}
                           onSelect={onSelectNode}
                           style={{ padding: '8px' }}
                       />
