@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Layout, Tree, Button, Modal, Form, Input, message, Typography, Select, Space, Segmented } from 'antd';
+import { Layout, Tree, Button, Modal, Form, Input, message, Typography, Select, Space, Segmented, Tabs } from 'antd';
 import { 
   PlusOutlined, 
   FileTextOutlined, 
@@ -50,6 +50,11 @@ const WorkspaceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [apis, setApis] = useState<ApiDef[]>([]);
   const [testCases, setTestCases] = useState<Record<number, ApiTestCase[]>>({});
+  
+  // Tab State
+  const [openTabs, setOpenTabs] = useState<{key: string, title: string, type: 'api'|'case', id: number, parentId?: number}[]>([]);
+  const [activeTabKey, setActiveTabKey] = useState<string>('');
+
   const [selectedApiId, setSelectedApiId] = useState<number | null>(null);
   const [selectedCaseId, setSelectedCaseId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,6 +68,28 @@ const WorkspaceDetail: React.FC = () => {
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [form] = Form.useForm();
   
+  // Sync Tabs to Selection
+  useEffect(() => {
+      if (!activeTabKey) {
+          // If no tab is active, we might want to clear selection or keep it? 
+          // For now, clear it.
+          setSelectedApiId(null);
+          setSelectedCaseId(null);
+          return;
+      }
+      
+      const tab = openTabs.find(t => t.key === activeTabKey);
+      if (tab) {
+          if (tab.type === 'api') {
+              setSelectedApiId(tab.id);
+              setSelectedCaseId(null);
+          } else if (tab.type === 'case') {
+              setSelectedApiId(tab.parentId || null);
+              setSelectedCaseId(tab.id);
+          }
+      }
+  }, [activeTabKey]); // Intentionally not including openTabs to avoid loops if tab title changes
+
   // Conflict State
   const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
   const [missingVars, setMissingVars] = useState<string[]>([]);
@@ -263,9 +290,11 @@ const WorkspaceDetail: React.FC = () => {
       setIsModalOpen(false);
       form.resetFields();
       fetchApis();
-      // Auto-select the new API
-      setSelectedApiId(newApi.data.id);
-      setSelectedCaseId(null);
+      // Auto-open new tab
+      const newKey = `api-${newApi.data.id}`;
+      setOpenTabs(prev => [...prev, { key: newKey, title: newApi.data.title, type: 'api', id: newApi.data.id }]);
+      setActiveTabKey(newKey);
+      
       if (!isViewer) setViewMode('debug');
     } catch (error) {
       message.error('Failed to create API');
@@ -462,26 +491,26 @@ const WorkspaceDetail: React.FC = () => {
       if (keys.length === 0) return;
       const node = info.node;
       setHistorySelection(null);
+      
+      let key = '';
+      let newTab = null;
+
       if (node.isCase) {
-          setSelectedApiId(node.apiId);
-          setSelectedCaseId(node.caseId);
-          fetchCases(node.apiId);
+          key = `case-${node.caseId}`;
+          newTab = { key, title: node.title, type: 'case', id: node.caseId, parentId: node.apiId };
       } else if (node.apiId) {
-          setSelectedApiId(node.apiId);
-          setSelectedCaseId(null);
-          fetchCases(node.apiId);
+          key = `api-${node.apiId}`;
+          newTab = { key, title: node.title, type: 'api', id: node.apiId };
+      }
+
+      if (newTab) {
+          setOpenTabs(prev => {
+              if (prev.find(t => t.key === key)) return prev;
+              return [...prev, newTab as any];
+          });
+          setActiveTabKey(key);
       }
   };
-
-  const selectedApiData = apis.find(a => a.id === selectedApiId);
-  const currentCase = selectedCaseId ? testCases[selectedApiId!]?.find(c => c.id === selectedCaseId) : null;
-  
-  let debuggerData = selectedApiData;
-  if (historySelection) {
-      debuggerData = { ...selectedApiData, content: JSON.stringify(historySelection) } as ApiDef;
-  } else if (currentCase) {
-      debuggerData = { ...selectedApiData, content: currentCase.content } as ApiDef;
-  }
 
   const handleImportPostman = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -712,7 +741,10 @@ const WorkspaceDetail: React.FC = () => {
         setCurlModalOpen(false);
         setCurlInput('');
         fetchApis();
-        setSelectedApiId(res.data.id);
+        
+        const newKey = `api-${res.data.id}`;
+        setOpenTabs(prev => [...prev, { key: newKey, title: res.data.title, type: 'api', id: res.data.id }]);
+        setActiveTabKey(newKey);
     } catch (e) {
         message.error('Failed to parse and import cURL command');
     }
@@ -730,6 +762,21 @@ const WorkspaceDetail: React.FC = () => {
         onClick: () => document.getElementById('postman-import')?.click()
     }
   ];
+
+  const onEdit = (targetKey: any, action: 'add' | 'remove') => {
+    if (action === 'remove') {
+        const targetIndex = openTabs.findIndex((t) => t.key === targetKey);
+        const newTabs = openTabs.filter((t) => t.key !== targetKey);
+        
+        if (newTabs.length && targetKey === activeTabKey) {
+            const newActiveKey = newTabs[targetIndex === newTabs.length ? targetIndex - 1 : targetIndex].key;
+            setActiveTabKey(newActiveKey);
+        } else if (!newTabs.length) {
+            setActiveTabKey('');
+        }
+        setOpenTabs(newTabs);
+    }
+  };
 
   return (
     <Layout style={{ height: '100%', background: '#fff' }}>
@@ -861,35 +908,65 @@ const WorkspaceDetail: React.FC = () => {
           </Sider>
         </Resizable>
         <Content style={{ padding: '0 0', overflow: 'auto' }}>
-            {viewMode === 'debug' ? (
-                <ApiDebugger 
-                    apiData={debuggerData} 
-                    isCase={!!selectedCaseId}
-                    onSave={(d) => { 
-                        if (selectedCaseId) {
-                            handleUpdateCase(d);
-                        } else if (selectedApiId) {
-                            handleSaveApi(d); 
-                            setHistoryRefresh(n => n + 1); 
+            {openTabs.length > 0 ? (
+                <Tabs
+                    type="editable-card"
+                    activeKey={activeTabKey}
+                    onChange={setActiveTabKey}
+                    onEdit={onEdit}
+                    hideAdd
+                    style={{ height: '100%' }}
+                    items={openTabs.map(tab => {
+                        // Resolve Data
+                        let data: any = null;
+                        if (tab.type === 'api') {
+                            data = apis.find(a => a.id === tab.id);
                         } else {
-                            // Create New API from Debugger
-                            api.post('/api-definitions', {
-                                title: d.title || 'Untitled Request',
-                                workspace: { id: Number(id) },
-                                content: JSON.stringify(d.content)
-                            }).then(res => {
-                                message.success('Request saved');
-                                fetchApis();
-                                setSelectedApiId(res.data.id);
-                            }).catch(() => message.error('Failed to create API'));
+                            const parent = apis.find(a => a.id === tab.parentId);
+                            const tc = testCases[tab.parentId!]?.find(c => c.id === tab.id);
+                            if (parent && tc) data = { ...parent, content: tc.content, title: tc.name };
                         }
-                    }}
-                    onDelete={selectedApiId ? (selectedCaseId ? () => handleDeleteCase(selectedCaseId!) : handleDeleteApi) : undefined}
-                    onSaveCase={selectedApiId ? handleSaveCase : undefined}
-                    onHistory={() => setIsHistoryOpen(true)}
-                /> 
+                        
+                        // History Override (Only if this tab is active)
+                        if (tab.key === activeTabKey && historySelection) {
+                             data = { ...data, content: JSON.stringify(historySelection) };
+                        }
+
+                        return {
+                            label: tab.title,
+                            key: tab.key,
+                            children: (
+                                <div style={{ height: '100%', overflow: 'hidden' }}>
+                                {viewMode === 'debug' ? (
+                                    <ApiDebugger 
+                                        apiData={data} 
+                                        isCase={tab.type === 'case'}
+                                        onSave={(d) => { 
+                                            if (selectedCaseId) {
+                                                handleUpdateCase(d);
+                                            } else if (selectedApiId) {
+                                                handleSaveApi(d); 
+                                                setHistoryRefresh(n => n + 1); 
+                                            } else {
+                                                // Should not happen in tab mode usually as tabs are bound to IDs
+                                            }
+                                        }}
+                                        onDelete={selectedApiId ? (selectedCaseId ? () => handleDeleteCase(selectedCaseId!) : handleDeleteApi) : undefined}
+                                        onSaveCase={selectedApiId ? handleSaveCase : undefined}
+                                        onHistory={() => setIsHistoryOpen(true)}
+                                    /> 
+                                ) : (
+                                    <Documentation apiData={data} />
+                                )}
+                                </div>
+                            )
+                        };
+                    })} 
+                />
             ) : (
-                selectedApiId ? <Documentation apiData={debuggerData} /> : <div style={{ padding: 24, textAlign: 'center' }}><Text type="secondary">Select an API to view documentation</Text></div>
+                <div style={{ padding: 40, textAlign: 'center', marginTop: 100 }}>
+                    <Text type="secondary">Select an API from the sidebar to open a tab</Text>
+                </div>
             )}
         </Content>
       </Layout>
