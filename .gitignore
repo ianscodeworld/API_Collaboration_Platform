@@ -5,6 +5,7 @@
 *.swo
 *.DS_Store
 *.iml
+.mtj.tmp/
 
 # OS files
 Thumbs.db
@@ -15,6 +16,20 @@ db.desktop
 *.err
 *.out
 .gemini/
+hs_err_pid*
+replay_pid*
+
+# Compiled class file
+*.class
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
 
 # Build and Dependencies - Root
 target/
