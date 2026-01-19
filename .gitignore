@@ -1,0 +1,49 @@
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.DS_Store
+*.iml
+
+# OS files
+Thumbs.db
+db.desktop
+
+# Logs
+*.log
+*.err
+*.out
+.gemini/
+
+# Build and Dependencies - Root
+target/
+dist/
+node_modules/
+bin/
+out/
+
+# Backend (Java/Maven)
+backend/target/
+backend/bin/
+backend/*.log
+backend/*.err
+
+# Frontend (Node/React/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr
+frontend/*.local
+frontend/.env*
+frontend/.eslintcache
+frontend/frontend.log
+
+# Mock Server
+mock-oauth2-server/target/
+mock-oauth2-server/bin/
+
+# Temp files
+temp/
+tmp/
+.temp/
+.tmp/
