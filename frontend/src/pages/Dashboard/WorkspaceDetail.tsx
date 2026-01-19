@@ -1,3 +1,12 @@
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { Layout, Tree, Button, Modal, Form, Input, message, Typography, Select, Space, Segmented } from 'antd';
+import { 
+  PlusOutlined, 
+  FileTextOutlined, 
+  SettingOutlined, 
+  EyeOutlined, 
+  CodeOutlined, 
   ImportOutlined,
   ExportOutlined,
   CopyOutlined,
@@ -394,8 +403,6 @@ const WorkspaceDetail: React.FC = () => {
     return nodes;
   };
 
-  const treeData = getTreeData();
-
   const onSelectNode = (keys: any[], info: any) => {
       if (keys.length === 0) return;
       const node = info.node;
@@ -783,7 +790,7 @@ const WorkspaceDetail: React.FC = () => {
                           checkable
                           checkedKeys={checkedKeys}
                           onCheck={onCheck as any}
-                          treeData={getTreeData()}
+                          treeData={getTreeData() as any}
                           onSelect={onSelectNode}
                           style={{ padding: '8px' }}
                       />

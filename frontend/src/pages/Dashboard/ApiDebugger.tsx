@@ -170,34 +170,38 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
     // --- Handlers ---
 
     const handleSaveInternal = () => {
+      const content = {
+          method,
+          url,
+          tags,
+          queryParams,
+          headers,
+          bodyType,
+          bodyContent
+      };
 
-        const content = {
+      if (onSave) {
+          onSave({ title, content });
+      }
+  };
 
-            method,
-
-            url,
-
-            tags,
-
-            queryParams,
-
-            headers,
-
-            bodyType,
-
-            bodyContent
-
-        };
-
-  
-
-        if (onSave) {
-
-            onSave({ title, content });
-
-        }
-
-    };
+  const handleSaveAsCase = () => {
+    const name = prompt('Case Name:');
+    if (name && onSaveCase) {
+        onSaveCase({
+            name,
+            content: JSON.stringify({
+                method,
+                url,
+                tags,
+                queryParams,
+                headers,
+                bodyType,
+                bodyContent
+            })
+        });
+    }
+  };
 
   const generateCurl = () => {
     let curl = `curl --location --request ${method} '${url}'`;
