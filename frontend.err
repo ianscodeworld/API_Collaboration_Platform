@@ -1,0 +1,58 @@
+[2m21:55:54[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+Error: read ECONNRESET
+    at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[2m21:55:59[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768830959122[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:56:04[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768830964137[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:56:09[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768830969152[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:56:14[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768830974164[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:56:19[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768830979180[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:29[22m [31m[1m[vite][22m[39m [31mws proxy error:[39m
+Error: read ECONNRESET
+    at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+[2m21:57:34[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831054284[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:39[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831059293[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:44[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831064318[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:49[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831069339[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:54[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831074345[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:57:59[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831079360[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:58:04[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831084380[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+[2m21:58:09[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /ws-stomp/info?t=1768831089397[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)

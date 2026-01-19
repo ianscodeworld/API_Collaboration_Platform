@@ -1,0 +1,68 @@
+curl --location '' \
+--header 'Content-Type: application/json' \
+--data '{
+	"name": "Add your name in the body"
+}'
+
+
+//curl (cmd)
+curl ^"http://localhost:5173/api/v1/api-test-cases/2^" ^
+  -X ^"PUT^" ^
+  -H ^"Accept: application/json, text/plain, */*^" ^
+  -H ^"Accept-Language: zh-CN,zh;q=0.9,en;q=0.8^" ^
+  -H ^"Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2ODcyNjM5NCwiZXhwIjoxNzY4ODEyNzk0fQ.-6naU6I9y3vNIVSIm1R3uajHPtKJ6FzwYL6BTH6RH5A^" ^
+  -H ^"Connection: keep-alive^" ^
+  -H ^"Content-Type: application/json^" ^
+  -H ^"Origin: http://localhost:5173^" ^
+  -H ^"Referer: http://localhost:5173/workspace/1^" ^
+  -H ^"Sec-Fetch-Dest: empty^" ^
+  -H ^"Sec-Fetch-Mode: cors^" ^
+  -H ^"Sec-Fetch-Site: same-origin^" ^
+  -H ^"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36^" ^
+  -H ^"sec-ch-ua: ^\^"Google Chrome^\^";v=^\^"143^\^", ^\^"Chromium^\^";v=^\^"143^\^", ^\^"Not A(Brand^\^";v=^\^"24^\^"^" ^
+  -H ^"sec-ch-ua-mobile: ?0^" ^
+  -H ^"sec-ch-ua-platform: ^\^"Windows^\^"^" ^
+  --data-raw ^"^{^\^"id^\^":2,^\^"name^\^":^\^"Error Case^\^",^\^"apiDefinition^\^":^{^\^"id^\^":6,^\^"title^\^":^\^"Fake Token Test1d^\^",^\^"version^\^":null,^\^"content^\^":^\^"^{^\^\^\^"method^\^\^\^":^\^\^\^"GET^\^\^\^",^\^\^\^"url^\^\^\^":^\^\^\^"http://localhost:8081/api/protected-data1^\^\^\^",^\^\^\^"queryParams^\^\^\^":^[^{^\^\^\^"id^\^\^\^":1768654246551,^\^\^\^"key^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^}^],^\^\^\^"headers^\^\^\^":^[^{^\^\^\^"id^\^\^\^":1768654246551,^\^\^\^"key^\^\^\^":^\^\^\^"Authorization^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^{^{Fake_token^}^}^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^},^{^\^\^\^"id^\^\^\^":1768654267985,^\^\^\^"key^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^}^],^\^\^\^"bodyType^\^\^\^":^\^\^\^"json^\^\^\^",^\^\^\^"bodyContent^\^\^\^":^\^\^\^"^\^\^\^"^}^\^",^\^"updatedAt^\^":^\^"2026-01-17T23:48:52.192737^\^"^},^\^"content^\^":^\^"^{^\^\^\^"method^\^\^\^":^\^\^\^"GET^\^\^\^",^\^\^\^"url^\^\^\^":^\^\^\^"http://localhost:8081/api/protected-data^\^\^\^",^\^\^\^"queryParams^\^\^\^":^[^{^\^\^\^"id^\^\^\^":1768654246551,^\^\^\^"key^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^}^],^\^\^\^"headers^\^\^\^":^[^{^\^\^\^"id^\^\^\^":1768654246551,^\^\^\^"key^\^\^\^":^\^\^\^"Authorization^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^{^{Fake_token^}^}^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^},^{^\^\^\^"id^\^\^\^":1768654267985,^\^\^\^"key^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"value^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"type^\^\^\^":^\^\^\^"string^\^\^\^",^\^\^\^"description^\^\^\^":^\^\^\^"^\^\^\^",^\^\^\^"enabled^\^\^\^":true^}^],^\^\^\^"bodyType^\^\^\^":^\^\^\^"json^\^\^\^",^\^\^\^"bodyContent^\^\^\^":^\^\^\^"^\^\^\^"^}^\^",^\^"createdAt^\^":^\^"2026-01-17T21:22:33.962578^\^"^}^"
+
+//curl (bash)
+curl 'http://localhost:5173/api/v1/api-test-cases/2' \
+  -X 'PUT' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2ODcyNjM5NCwiZXhwIjoxNzY4ODEyNzk0fQ.-6naU6I9y3vNIVSIm1R3uajHPtKJ6FzwYL6BTH6RH5A' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://localhost:5173' \
+  -H 'Referer: http://localhost:5173/workspace/1' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  --data-raw '{"id":2,"name":"Error Case","apiDefinition":{"id":6,"title":"Fake Token Test1d","version":null,"content":"{\"method\":\"GET\",\"url\":\"http://localhost:8081/api/protected-data1\",\"queryParams\":[{\"id\":1768654246551,\"key\":\"\",\"value\":\"\",\"type\":\"string\",\"description\":\"\",\"enabled\":true}],\"headers\":[{\"id\":1768654246551,\"key\":\"Authorization\",\"value\":\"{{Fake_token}}\",\"type\":\"string\",\"description\":\"\",\"enabled\":true},{\"id\":1768654267985,\"key\":\"\",\"value\":\"\",\"type\":\"string\",\"description\":\"\",\"enabled\":true}],\"bodyType\":\"json\",\"bodyContent\":\"\"}","updatedAt":"2026-01-17T23:48:52.192737"},"content":"{\"method\":\"GET\",\"url\":\"http://localhost:8081/api/protected-data\",\"queryParams\":[{\"id\":1768654246551,\"key\":\"\",\"value\":\"\",\"type\":\"string\",\"description\":\"\",\"enabled\":true}],\"headers\":[{\"id\":1768654246551,\"key\":\"Authorization\",\"value\":\"{{Fake_token}}\",\"type\":\"string\",\"description\":\"\",\"enabled\":true},{\"id\":1768654267985,\"key\":\"\",\"value\":\"\",\"type\":\"string\",\"description\":\"\",\"enabled\":true}],\"bodyType\":\"json\",\"bodyContent\":\"\"}","createdAt":"2026-01-17T21:22:33.962578"}'
+
+
+//curl (powershell)
+$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$session.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:5173/api/v1/api-test-cases/2" `
+-Method "PUT" `
+-WebSession $session `
+-Headers @{
+"Accept"="application/json, text/plain, */*"
+  "Accept-Encoding"="gzip, deflate, br, zstd"
+  "Accept-Language"="zh-CN,zh;q=0.9,en;q=0.8"
+  "Authorization"="Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2ODcyNjM5NCwiZXhwIjoxNzY4ODEyNzk0fQ.-6naU6I9y3vNIVSIm1R3uajHPtKJ6FzwYL6BTH6RH5A"
+  "Origin"="http://localhost:5173"
+  "Referer"="http://localhost:5173/workspace/1"
+  "Sec-Fetch-Dest"="empty"
+  "Sec-Fetch-Mode"="cors"
+  "Sec-Fetch-Site"="same-origin"
+  "sec-ch-ua"="`"Google Chrome`";v=`"143`", `"Chromium`";v=`"143`", `"Not A(Brand`";v=`"24`""
+  "sec-ch-ua-mobile"="?0"
+  "sec-ch-ua-platform"="`"Windows`""
+} `
+-ContentType "application/json" `
+-Body "{`"id`":2,`"name`":`"Error Case`",`"apiDefinition`":{`"id`":6,`"title`":`"Fake Token Test1d`",`"version`":null,`"content`":`"{\`"method\`":\`"GET\`",\`"url\`":\`"http://localhost:8081/api/protected-data1\`",\`"queryParams\`":[{\`"id\`":1768654246551,\`"key\`":\`"\`",\`"value\`":\`"\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true}],\`"headers\`":[{\`"id\`":1768654246551,\`"key\`":\`"Authorization\`",\`"value\`":\`"{{Fake_token}}\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true},{\`"id\`":1768654267985,\`"key\`":\`"\`",\`"value\`":\`"\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true}],\`"bodyType\`":\`"json\`",\`"bodyContent\`":\`"\`"}`",`"updatedAt`":`"2026-01-17T23:48:52.192737`"},`"content`":`"{\`"method\`":\`"GET\`",\`"url\`":\`"http://localhost:8081/api/protected-data\`",\`"queryParams\`":[{\`"id\`":1768654246551,\`"key\`":\`"\`",\`"value\`":\`"\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true}],\`"headers\`":[{\`"id\`":1768654246551,\`"key\`":\`"Authorization\`",\`"value\`":\`"{{Fake_token}}\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true},{\`"id\`":1768654267985,\`"key\`":\`"\`",\`"value\`":\`"\`",\`"type\`":\`"string\`",\`"description\`":\`"\`",\`"enabled\`":true}],\`"bodyType\`":\`"json\`",\`"bodyContent\`":\`"\`"}`",`"createdAt`":`"2026-01-17T21:22:33.962578`"}"

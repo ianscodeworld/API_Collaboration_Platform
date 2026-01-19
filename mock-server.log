@@ -1,0 +1,18 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.2)
+
+2026-01-19T21:45:37.993+08:00  INFO 19400 --- [mock-oauth2-server] [           main] c.apicollab.mock.MockOAuth2Application   : Starting MockOAuth2Application v0.0.1-SNAPSHOT using Java 21.0.6 with PID 19400 (C:\Users\Ian\sandbox\API_Collaboration_Platform\mock-oauth2-server\target\mock-oauth2-server-0.0.1-SNAPSHOT.jar started by Ian in C:\Users\Ian\sandbox\API_Collaboration_Platform)
+2026-01-19T21:45:37.995+08:00  INFO 19400 --- [mock-oauth2-server] [           main] c.apicollab.mock.MockOAuth2Application   : No active profile set, falling back to 1 default profile: "default"
+2026-01-19T21:45:38.738+08:00  INFO 19400 --- [mock-oauth2-server] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-01-19T21:45:38.747+08:00  INFO 19400 --- [mock-oauth2-server] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-19T21:45:38.747+08:00  INFO 19400 --- [mock-oauth2-server] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-01-19T21:45:38.770+08:00  INFO 19400 --- [mock-oauth2-server] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-19T21:45:38.771+08:00  INFO 19400 --- [mock-oauth2-server] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 728 ms
+2026-01-19T21:45:39.026+08:00  INFO 19400 --- [mock-oauth2-server] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path ''
+2026-01-19T21:45:39.044+08:00  INFO 19400 --- [mock-oauth2-server] [           main] c.apicollab.mock.MockOAuth2Application   : Started MockOAuth2Application in 1.539 seconds (process running for 1.875)

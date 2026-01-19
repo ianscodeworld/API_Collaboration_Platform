@@ -1,0 +1,51 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.2)
+
+2026-01-19T22:08:43.914+08:00  INFO 30172 --- [api-collaboration-platform] [           main] .a.p.ApiCollaborationPlatformApplication : Starting ApiCollaborationPlatformApplication v0.0.1-SNAPSHOT using Java 21.0.6 with PID 30172 (C:\Users\Ian\sandbox\API_Collaboration_Platform\backend\target\platform-0.0.1-SNAPSHOT.jar started by Ian in C:\Users\Ian\sandbox\API_Collaboration_Platform)
+2026-01-19T22:08:43.917+08:00  INFO 30172 --- [api-collaboration-platform] [           main] .a.p.ApiCollaborationPlatformApplication : No active profile set, falling back to 1 default profile: "default"
+2026-01-19T22:08:44.581+08:00  INFO 30172 --- [api-collaboration-platform] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-19T22:08:44.628+08:00  INFO 30172 --- [api-collaboration-platform] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 7 JPA repository interfaces.
+2026-01-19T22:08:45.096+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-01-19T22:08:45.109+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-19T22:08:45.110+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-01-19T22:08:45.135+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-19T22:08:45.136+08:00  INFO 30172 --- [api-collaboration-platform] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1166 ms
+2026-01-19T22:08:45.313+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-19T22:08:45.383+08:00  INFO 30172 --- [api-collaboration-platform] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-01-19T22:08:45.414+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-19T22:08:45.586+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-19T22:08:45.601+08:00  INFO 30172 --- [api-collaboration-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-19T22:08:45.658+08:00  INFO 30172 --- [api-collaboration-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.mariadb.jdbc.Connection@7e2bc2f4
+2026-01-19T22:08:45.659+08:00  INFO 30172 --- [api-collaboration-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-19T22:08:45.673+08:00  WARN 30172 --- [api-collaboration-platform] [           main] org.hibernate.orm.deprecation            : HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-19T22:08:46.268+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-19T22:08:46.313+08:00  INFO 30172 --- [api-collaboration-platform] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-19T22:08:46.838+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-19T22:08:47.197+08:00  WARN 30172 --- [api-collaboration-platform] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-19T22:08:47.386+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@f6e9c18, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@75225415, org.springframework.security.web.context.SecurityContextHolderFilter@6e0fd2dc, org.springframework.security.web.header.HeaderWriterFilter@3606c525, org.springframework.web.filter.CorsFilter@1f6af096, org.springframework.security.web.authentication.logout.LogoutFilter@2140582, com.apicollab.platform.auth.config.JwtAuthenticationFilter@54b3407b, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1be6c991, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@18482805, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2fc698a9, org.springframework.security.web.session.SessionManagementFilter@766534b0, org.springframework.security.web.access.ExceptionTranslationFilter@7e32442d, org.springframework.security.web.access.intercept.AuthorizationFilter@55a7f0af]
+2026-01-19T22:08:47.391+08:00  WARN 30172 --- [api-collaboration-platform] [           main] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Mvc [pattern='/api/v1/test/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-19T22:08:47.391+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will not secure Mvc [pattern='/api/v1/test/**']
+2026-01-19T22:08:47.391+08:00  WARN 30172 --- [api-collaboration-platform] [           main] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Mvc [pattern='/api/v1/mock/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-19T22:08:47.391+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will not secure Mvc [pattern='/api/v1/mock/**']
+2026-01-19T22:08:47.391+08:00  WARN 30172 --- [api-collaboration-platform] [           main] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Mvc [pattern='/ws-stomp/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-19T22:08:47.391+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will not secure Mvc [pattern='/ws-stomp/**']
+2026-01-19T22:08:47.391+08:00  WARN 30172 --- [api-collaboration-platform] [           main] o.s.s.c.a.web.builders.WebSecurity       : You are asking Spring Security to ignore Mvc [pattern='/**', OPTIONS]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-19T22:08:47.392+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will not secure Mvc [pattern='/**', OPTIONS]
+2026-01-19T22:08:47.590+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-01-19T22:08:47.591+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-01-19T22:08:47.593+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@520b547c]]
+2026-01-19T22:08:47.594+08:00  INFO 30172 --- [api-collaboration-platform] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-01-19T22:08:47.604+08:00  INFO 30172 --- [api-collaboration-platform] [           main] .a.p.ApiCollaborationPlatformApplication : Started ApiCollaborationPlatformApplication in 3.961 seconds (process running for 4.385)
+--- DEBUG: RESETTING ADMIN ---
+Admin password reset to 'password'
+------------------------
+2026-01-19T22:09:21.800+08:00  INFO 30172 --- [api-collaboration-platform] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-19T22:09:21.800+08:00  INFO 30172 --- [api-collaboration-platform] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-01-19T22:09:21.801+08:00  INFO 30172 --- [api-collaboration-platform] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-01-19T22:09:47.576+08:00  INFO 30172 --- [api-collaboration-platform] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
