@@ -9,27 +9,27 @@ import {
   Typography, 
   Tag, 
   Layout, 
-  Empty,
-  Popconfirm,
-  message,
-  Dropdown
-} from 'antd';
-import type { MenuProps } from 'antd';
-import { 
-  SendOutlined, 
-  SaveOutlined,
-  DeleteOutlined,
-  RocketOutlined,
-  PlusOutlined,
-  HistoryOutlined,
-  CopyOutlined,
-  MoreOutlined
-} from '@ant-design/icons';
-import { Resizable } from 're-resizable';
-import api from '../../api';
-import { useAuthStore } from '../../store/useAuthStore';
-import { useEnvStore } from '../../store/useEnvStore';
-
+      Empty,
+      Popconfirm,
+      message,
+      Segmented
+    } from 'antd';
+    import { 
+      SendOutlined, 
+      SaveOutlined,
+      DeleteOutlined,
+      RocketOutlined,
+      PlusOutlined,
+      HistoryOutlined,
+      CopyOutlined,
+      CommentOutlined,
+      LayoutOutlined,
+      BorderOutlined
+    } from '@ant-design/icons';  import { Resizable } from 're-resizable';
+  import api from '../../api';
+  import { useAuthStore } from '../../store/useAuthStore';
+  import { useEnvStore } from '../../store/useEnvStore';
+  import CommentDrawer from './CommentDrawer';
 const { Option } = Select;
 const { Text } = Typography;
 
@@ -69,6 +69,8 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
   const isViewer = role === 'VIEWER';
 
   const [requestHeight, setRequestHeight] = useState('50%');
+  const [layoutMode, setLayoutMode] = useState<'vertical' | 'horizontal'>('vertical');
+  const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
 
   // --- State ---
 
@@ -88,7 +90,41 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
 
     const [queryParams, setQueryParams] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
 
+    const [pathVariables, setPathVariables] = useState<KeyValue[]>([]);
+
     const [headers, setHeaders] = useState<KeyValue[]>([{ id: 0, key: '', value: '', type: 'string', description: '', enabled: true }]);
+
+    // Path Variable Extraction
+    useEffect(() => {
+        const matches = url.match(/[:{]([a-zA-Z0-9_]+)}?/g) || [];
+        const foundKeys = matches.map(m => m.replace(/[:{}]/g, ''));
+        
+        setPathVariables(prev => {
+            const newVars = [...prev];
+            let changed = false;
+
+            // Add new ones
+            foundKeys.forEach(key => {
+                if (!newVars.find(v => v.key === key)) {
+                    newVars.push({ 
+                        id: Math.floor(Math.random() * 1000000000), 
+                        key, 
+                        value: '', 
+                        type: 'string', 
+                        description: 'Path variable', 
+                        enabled: true 
+                    });
+                    changed = true;
+                }
+            });
+
+            // Remove non-existent ones
+            const filtered = newVars.filter(v => foundKeys.includes(v.key));
+            if (filtered.length !== newVars.length) changed = true;
+
+            return changed ? filtered : prev;
+        });
+    }, [url]);
 
     const [bodyType, setBodyType] = useState('json');
 
@@ -131,6 +167,9 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
             const qp = content.queryParams || [];
 
             setQueryParams(qp.length > 0 ? qp : [{ id: Math.floor(Math.random() * 1000000000), key: '', value: '', type: 'string', description: '', enabled: true }]);
+
+            const pv = content.pathVariables || [];
+            setPathVariables(pv);
 
             const hd = content.headers || [];
 
@@ -178,6 +217,7 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
           url,
           tags,
           queryParams,
+          pathVariables,
           headers,
           bodyType,
           bodyContent
@@ -198,6 +238,7 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                 url,
                 tags,
                 queryParams,
+                pathVariables,
                 headers,
                 bodyType,
                 bodyContent
@@ -301,13 +342,59 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
 
 
 
-    // Prepare Query Params
+        // Prepare Query Params
 
-    const activeParams = queryParams.filter(p => p.enabled && p.key);
 
-    let finalUrl = interpolate(url, activeVariables);
 
-    if (activeParams.length > 0) {
+        const activeParams = queryParams.filter(p => p.enabled && p.key);
+
+
+
+        let finalUrl = interpolate(url, activeVariables);
+
+
+
+    
+
+
+
+        // Prepare Path Variables
+
+
+
+        pathVariables.forEach(v => {
+
+
+
+            if (v.key && v.enabled) {
+
+
+
+                const val = interpolate(v.value, activeVariables);
+
+
+
+                // Replace :key or {key}
+
+
+
+                finalUrl = finalUrl.replace(new RegExp(`[:{]${v.key}}?`, 'g'), val);
+
+
+
+            }
+
+
+
+        });
+
+
+
+    
+
+
+
+        if (activeParams.length > 0) {
 
       const queryString = activeParams.map(p => `${p.key}=${interpolate(p.value, activeVariables)}`).join('&');
 
@@ -729,11 +816,24 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                     </Button>
                     {!isViewer && (
                         <>
-                            <Button icon={<CopyOutlined />} size="large" onClick={handleCopyCurl}>Copy cURL</Button>
-                            <Button icon={<SaveOutlined />} size="large" onClick={handleSaveInternal}>Save</Button>
-                            <Button icon={<HistoryOutlined />} size="large" onClick={onHistory} />
-                            <Button icon={<PlusOutlined />} size="large" onClick={handleSaveAsCase}>Save as Case</Button>
-                            {apiData && onDelete && (
+                                                                    <Button icon={<CopyOutlined />} size="large" onClick={handleCopyCurl}>Copy cURL</Button>
+                                                                    <Button icon={<SaveOutlined />} size="large" onClick={handleSaveInternal}>Save</Button>
+                                                                    <Segmented
+                                                                        value={layoutMode}
+                                                                        onChange={(v) => setLayoutMode(v as any)}
+                                                                        size="large"
+                                                                        options={[
+                                                                            { value: 'vertical', icon: <BorderOutlined title="Vertical Layout" /> },
+                                                                            { value: 'horizontal', icon: <LayoutOutlined title="Horizontal Layout" rotate={90} /> },
+                                                                        ]}
+                                                                    />
+                                                                    <Button 
+                                                                        icon={<CommentOutlined />} 
+                                                                        size="large" 
+                                                                        onClick={() => setIsCommentDrawerOpen(true)}
+                                                                        title="View Comments"
+                                                                    />                                                <Button icon={<HistoryOutlined />} size="large" onClick={onHistory} />
+                                                <Button icon={<PlusOutlined />} size="large" onClick={handleSaveAsCase}>Save as Case</Button>                            {apiData && onDelete && (
                                 <Popconfirm title={isCase ? "Delete this Case?" : "Delete this API?"} onConfirm={onDelete}>
                                     <Button icon={<DeleteOutlined />} size="large" danger />
                                 </Popconfirm>
@@ -746,20 +846,39 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
       </div>
 
       {/* 2. Main Content Split */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: layoutMode === 'vertical' ? 'column' : 'row', 
+          overflow: 'hidden' 
+      }}>
         
         {/* Request Section */}
         <Resizable
-            size={{ width: '100%', height: requestHeight }}
-            onResizeStop={(_e, _direction, ref, _d) => {
-                setRequestHeight(ref.style.height);
+            size={{ 
+                width: layoutMode === 'vertical' ? '100%' : '50%', 
+                height: layoutMode === 'vertical' ? requestHeight : '100%' 
             }}
-            minHeight="20%"
-            maxHeight="80%"
-            enable={{ bottom: true }}
-            handleStyles={{ bottom: { height: 6, bottom: -3, cursor: 'row-resize', zIndex: 10 } }}
-            handleClasses={{ bottom: 'hover-resize-handle' }}
-            style={{ borderBottom: '4px solid #f0f0f0' }}
+            onResizeStop={(_e, _direction, ref, _d) => {
+                if (layoutMode === 'vertical') setRequestHeight(ref.style.height);
+            }}
+            minHeight={layoutMode === 'vertical' ? "20%" : "100%"}
+            maxHeight={layoutMode === 'vertical' ? "80%" : "100%"}
+            minWidth={layoutMode === 'horizontal' ? "20%" : "100%"}
+            maxWidth={layoutMode === 'horizontal' ? "80%" : "100%"}
+            enable={layoutMode === 'vertical' ? { bottom: true } : { right: true }}
+            handleStyles={{ 
+                bottom: { height: 6, bottom: -3, cursor: 'row-resize', zIndex: 10 },
+                right: { width: 6, right: -3, cursor: 'col-resize', zIndex: 10 }
+            }}
+            handleClasses={{ 
+                bottom: 'hover-resize-handle',
+                right: 'hover-resize-handle'
+            }}
+            style={{ 
+                borderBottom: layoutMode === 'vertical' ? '4px solid #f0f0f0' : 'none',
+                borderRight: layoutMode === 'horizontal' ? '4px solid #f0f0f0' : 'none'
+            }}
         >
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
              <Tabs 
@@ -777,7 +896,21 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                         key: '1',
                         label: 'Params',
                         children: (
-                            <div style={{ padding: '0 24px' }}>
+                            <div style={{ padding: '0 24px', overflow: 'auto', height: '100%' }}>
+                                {pathVariables.length > 0 && (
+                                    <>
+                                        <Text strong style={{ display: 'block', margin: '12px 0' }}>Path Variables</Text>
+                                        <Table 
+                                            dataSource={pathVariables} 
+                                            columns={columns(pathVariables, setPathVariables).filter(c => c.title !== '')} // No delete for path vars
+                                            pagination={false} 
+                                            size="small"
+                                            rowKey="id"
+                                            bordered={false}
+                                            style={{ marginBottom: 24 }}
+                                        />
+                                    </>
+                                )}
                                 <Text strong style={{ display: 'block', margin: '12px 0' }}>Query Params</Text>
                                 <Table 
                                     dataSource={queryParams} 
@@ -881,6 +1014,32 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
                                 )
                             },
                             {
+                                key: 'preview',
+                                label: 'Preview',
+                                children: (
+                                    <div style={{ padding: '16px 24px', height: '100%', minHeight: '300px' }}>
+                                        { (function() {
+                                            const contentType = response.headers?.['content-type'] || '';
+                                            const body = response.body;
+                                            
+                                            if (typeof body === 'string' && body.startsWith('data:image')) {
+                                                return <img src={body} alt="Response" style={{ maxWidth: '100%' }} />;
+                                            }
+                                            
+                                            if (contentType.includes('text/html')) {
+                                                return <iframe 
+                                                    srcDoc={body} 
+                                                    title="Preview" 
+                                                    style={{ width: '100%', height: '500px', border: '1px solid #f0f0f0' }} 
+                                                />;
+                                            }
+
+                                            return <Empty description="Preview not available for this content type" />;
+                                        })() }
+                                    </div>
+                                )
+                            },
+                            {
                                 key: 'headers',
                                 label: 'Headers',
                                 children: (
@@ -906,6 +1065,14 @@ const ApiDebugger: React.FC<ApiDebuggerProps> = ({ apiData, isCase, onSave, onDe
         </div>
 
       </div>
+      
+      {apiData?.id && (
+          <CommentDrawer 
+            apiId={apiData.id} 
+            open={isCommentDrawerOpen} 
+            onClose={() => setIsCommentDrawerOpen(false)} 
+          />
+      )}
     </Layout>
   );
 };

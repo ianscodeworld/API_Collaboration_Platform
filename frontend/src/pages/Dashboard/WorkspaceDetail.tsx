@@ -29,6 +29,7 @@ import { useEnvStore } from '../../store/useEnvStore';
 import type { Environment } from '../../store/useEnvStore';
 import { AppstoreOutlined, HistoryOutlined } from '@ant-design/icons';
 import { parseCurl } from '../../utils/curlParser';
+import { parseOpenApi } from '../../utils/openapiParser';
 import { getRequiredVariablesForApi } from '../../utils/variableUtils';
 
 const { Sider, Content, Header } = Layout;
@@ -68,6 +69,30 @@ const WorkspaceDetail: React.FC = () => {
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [form] = Form.useForm();
   
+  // Smart Paste (cURL)
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+        // Only trigger if not typing in an input
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            return;
+        }
+
+        const text = e.clipboardData?.getData('text') || '';
+        if (text.trim().startsWith('curl ')) {
+            Modal.confirm({
+                title: 'Import cURL?',
+                content: 'Detected a cURL command in your clipboard. Would you like to import it as a new API?',
+                okText: 'Import',
+                onOk: () => handleImportCurl(text)
+            });
+        }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [id]);
+
   // Sync Tabs to Selection
   useEffect(() => {
       if (!activeTabKey) {
@@ -648,6 +673,47 @@ const WorkspaceDetail: React.FC = () => {
     e.target.value = '';
   };
 
+  const handleImportOpenApi = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+        try {
+            const json = JSON.parse(event.target?.result as string);
+            const parsedApis = parseOpenApi(json);
+            
+            if (parsedApis.length === 0) {
+                message.warning("No valid APIs found in the OpenAPI specification.");
+                return;
+            }
+
+            const hide = message.loading(`Importing ${parsedApis.length} APIs...`, 0);
+            
+            for (const item of parsedApis) {
+                try {
+                    await api.post('/api-definitions', {
+                        title: item.title,
+                        workspace: { id: Number(id) },
+                        content: item.content
+                    });
+                } catch (saveErr) {
+                    console.error(`Failed to save imported API ${item.title}:`, saveErr);
+                }
+            }
+
+            hide();
+            message.success(`Successfully imported ${parsedApis.length} APIs`);
+            fetchApis();
+        } catch (err) {
+            console.error("OpenAPI Import Error:", err);
+            message.error('Failed to parse OpenAPI specification. Only JSON format is supported for now.');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   const handleExportCollection = () => {
     // Filter APIs if selection exists
     let apisToExport = apis;
@@ -712,9 +778,10 @@ const WorkspaceDetail: React.FC = () => {
     link.click();
   };
 
-  const handleImportCurl = async () => {
+  const handleImportCurl = async (overrideText?: string) => {
     try {
-        const parsed = parseCurl(curlInput);
+        const input = typeof overrideText === 'string' ? overrideText : curlInput;
+        const parsed = parseCurl(input);
         const content = {
             method: parsed.method,
             url: parsed.url,
@@ -760,6 +827,11 @@ const WorkspaceDetail: React.FC = () => {
         key: 'postman',
         label: 'Postman Collection (.json)',
         onClick: () => document.getElementById('postman-import')?.click()
+    },
+    {
+        key: 'openapi',
+        label: 'OpenAPI Specification (.json)',
+        onClick: () => document.getElementById('openapi-import')?.click()
     }
   ];
 
@@ -859,6 +931,13 @@ const WorkspaceDetail: React.FC = () => {
                                     style={{ display: 'none' }} 
                                     accept=".json"
                                     onChange={handleImportPostman}
+                                />
+                                <input 
+                                    type="file" 
+                                    id="openapi-import" 
+                                    style={{ display: 'none' }} 
+                                    accept=".json"
+                                    onChange={handleImportOpenApi}
                                 />
                                 <Dropdown menu={{ items: importMenuItems }} placement="bottomRight">
                                     <Button 
@@ -1022,7 +1101,7 @@ const WorkspaceDetail: React.FC = () => {
       <Modal
         title="Import from cURL"
         open={curlModalOpen}
-        onOk={handleImportCurl}
+        onOk={() => handleImportCurl()}
         onCancel={() => setCurlModalOpen(false)}
         width={600}
       >

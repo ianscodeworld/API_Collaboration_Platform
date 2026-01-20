@@ -86,56 +86,50 @@ To build a Postman/Apifox-style API life-cycle management platform specifically 
 
 ---
 
-## 6. Phase 3: Integration & Advanced UX (Next Steps)
+## 6. Phase 3: Integration & Advanced UX (Done)
 
-### 6.1 Swagger/OpenAPI Import (High Priority)
+### 6.1 Swagger/OpenAPI Import (Done)
 **Goal:** Enable importing existing Swagger/OpenAPI specifications to quickly populate workspaces.
 
 *   **Implementation Steps:**
-    1.  **Frontend Parsing:** Integrate `swagger-parser` or similar lightweight library.
-    2.  **Mapping:** Map OpenAPI paths, verbs, parameters, and bodies to the `ApiDefinition` JSON structure.
-    3.  **UI:** Add "Import OpenAPI" option to the sidebar Import menu. Support file upload (`.json`, `.yaml`) and URL import.
+    1.  **Frontend Parsing:** Integrated a lightweight custom mapper for JSON/YAML.
+    2.  **Mapping:** Maps OpenAPI paths, verbs, parameters, and bodies to the `ApiDefinition` structure.
+    3.  **UI:** Added "Import OpenAPI" option to the sidebar Import menu.
 
-### 6.2 Comments System (Team Collaboration)
+### 6.2 Comments System (Done)
 **Goal:** Allow users to discuss specific APIs or parameters directly within the interface.
 
 *   **Implementation Steps:**
-    1.  **Backend:** Create `Comment` entity (`apiId`, `fieldPath`, `content`, `userId`, `resolved`, `createdAt`).
+    1.  **Backend:** Created `Comment` entity and associated service/controller.
     2.  **API:** Endpoints for `POST /comments`, `GET /comments/{apiId}`, `PUT /comments/{id}/resolve`.
-    3.  **Frontend:**
-        *   Add a "Comments" side drawer or float button in `ApiDebugger`.
-        *   (Advanced) Allow clicking a parameter row to add a comment linked to that field (`fieldPath`).
+    3.  **Frontend:** Added a "Comments" side drawer in `ApiDebugger`.
     4.  **Real-time:** Broadcast new comments via WebSocket.
 
-### 6.3 Advanced UX Suite (The "Polish")
+### 6.3 Advanced UX Suite (Done)
 
-#### 6.3.1 Response Visualizer
+#### 6.3.1 Response Visualizer (Done)
 *   **Goal:** Better rendering for HTML/Image responses and binary file handling.
 *   **Implementation:** 
-    *   Add Tabs to Response area: `Preview` (iframe), `Raw` (text), `Image` (img tag).
-    *   **Binary Handling:** Detect `Content-Type` (PDF, Excel, Zip). If binary, prevent text rendering and show a "Download File" button with size info. Support PDF preview via `<embed>`.
+    *   Added a "Preview" tab for HTML/Image responses.
+    *   **Binary Handling:** Upgraded proxy to handle binary data via Base64 encoding.
 
-#### 6.3.2 Global Command Palette (Ctrl+K)
+#### 6.3.2 Global Command Palette (Ctrl+K) (Done)
 *   **Goal:** Rapid navigation.
 *   **Implementation:**
     *   Global key listener for `Ctrl/Cmd + K`.
-    *   Modal with fuzzy search (fuse.js) across all APIs and Workspaces.
-    *   Selecting an item navigates to it or opens it in a new tab.
+    *   Modal with fuzzy search across workspaces.
 
-#### 6.3.3 Smart Paste (cURL Detection)
+#### 6.3.3 Smart Paste (cURL Detection) (Done)
 *   **Goal:** Seamless import workflow.
 *   **Implementation:**
-    *   Global `onPaste` listener in `WorkspaceDetail`.
-    *   Regex check: If text starts with `curl `, prompt "Import cURL?".
-    *   If confirmed, parse and open in new tab.
+    *   Global `onPaste` listener detects `curl` commands and prompts for import.
 
-#### 6.3.4 Path Parameter Extraction
+#### 6.3.4 Path Parameter Extraction (Done)
 *   **Goal:** Auto-fill parameters from URL.
 *   **Implementation:**
-    *   Listen to URL Input `onChange`.
-    *   Regex match `:variable` or `{variable}`.
-    *   Automatically add/update entries in the `Params` table.
+    *   Listens to URL input and auto-populates a "Path Variables" table.
 
-#### 6.3.5 Layout Customization
+#### 6.3.5 Layout Customization (Done)
 *   **Goal:** Support different screen sizes and workflows.
-*   **Implementation:** Add a "Layout" toggle button to switch Request/Response view from "Top/Bottom" (Vertical Split) to "Left/Right" (Horizontal Split).
+*   **Implementation:** Added a layout toggle to switch Request/Response view from "Top/Bottom" to "Left/Right".
+

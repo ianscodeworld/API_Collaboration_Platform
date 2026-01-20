@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { LogoutOutlined, AppstoreOutlined, UserOutlined, TeamOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import api from '../api';
 import ChangePasswordModal from '../components/ChangePasswordModal';
+import CommandPalette from '../components/CommandPalette';
 import type { MenuProps } from 'antd';
 
 const { Header, Content, Sider } = Layout;
@@ -15,6 +16,18 @@ const MainLayout: React.FC = () => {
   const location = useLocation();
   const [personalWsId, setPersonalWsId] = useState<number | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            setIsPaletteOpen(true);
+        }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     api.get('/workspaces/personal')
@@ -113,6 +126,10 @@ const MainLayout: React.FC = () => {
          open={isPasswordModalOpen || mustChangePassword} 
          onClose={() => setIsPasswordModalOpen(false)} 
          forced={mustChangePassword}
+      />
+      <CommandPalette 
+         open={isPaletteOpen} 
+         onClose={() => setIsPaletteOpen(false)} 
       />
     </Layout>
   );

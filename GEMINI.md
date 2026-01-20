@@ -32,7 +32,7 @@ This project is an **Enterprise API Collaboration Platform** (Postman/Apifox alt
 - **Security:** Spring Security 6 (Stateless JWT, Global CORS).
 - **Database:** MariaDB (Auto-schema update enabled).
 
-## Implemented Features (MVP 1-4 + Phase 2 Complete)
+## Implemented Features (MVP 1-4 + Phase 2 + Phase 3 Complete)
 
 ### 1. Identity & Access Management
 - **JWT Auth:** Secure Login/Register flow.
@@ -43,23 +43,32 @@ This project is an **Enterprise API Collaboration Platform** (Postman/Apifox alt
 ### 2. Workspace & Collaboration
 - **Workspaces:** CRUD operations and ownership model.
 - **Real-time Sync:** API changes broadcast via WebSocket.
-- **Multi-Tab Interface (New):** Open multiple APIs/Cases in tabs, preserving state while switching.
-- **Smart Copy (New):** When copying APIs between workspaces, the system detects missing environment variables and offers to clone the source environment.
+- **Comments System (New):** Inline discussions on APIs with resolve functionality and real-time alerts.
+- **Multi-Tab Interface:** Open multiple APIs/Cases in tabs, preserving state while switching.
+- **Smart Copy:** When copying APIs between workspaces, the system detects missing environment variables and offers to clone the source environment.
 
 ### 3. API Lifecycle & Organization
 - **API CRUD:** Full lifecycle for definitions.
-- **API Tags (New):** Group APIs by custom tags in the sidebar and view them as badges in documentation.
+- **API Tags:** Group APIs by custom tags in the sidebar and view them as badges in documentation.
 - **Sidebar Modes:** Switch between "Folder View" (List) and "Tag View".
+- **Path Parameter Extraction (New):** Auto-detects `:param` or `{param}` in URL and populates a dedicated variables table.
 - **Auto-Versioning:** Snapshots created automatically on every Save.
 
 ### 4. Documentation & Code Gen
-- **Docs Revolution (New):** Multi-language code generation tabs (cURL, JavaScript/Fetch, Python/Requests, Java/OkHttp).
-- **Interactive Docs:** Integrated "Debug" mode alongside read-only documentation.
+- **Docs Revolution:** Multi-language code generation tabs (cURL, JavaScript/Fetch, Python/Requests, Java/OkHttp).
+- **Swagger/OpenAPI Import (New):** One-click import for OpenAPI 2.0/3.0 JSON specifications.
+- **Response Visualizer (New):** "Preview" tab for HTML/Image responses with binary proxy support.
 
 ### 5. Environment Engine & Auto-Auth
 - **Context Switching:** Multi-environment support (Local, Dev, Prod).
 - **Variables:** `{{baseUrl}}` substitution in URL/Headers/Body.
 - **OAuth2 Automation:** Backend fetches, caches, and injects Bearer tokens.
+
+### 6. UX Suite
+- **Global Command Palette (New):** `Ctrl+K` shortcut for rapid fuzzy searching of workspaces.
+- **Smart Paste (New):** Automatically detects cURL commands in clipboard and prompts for import.
+- **Layout Customization (New):** Toggle between Vertical and Horizontal split views in the debugger.
+- **Responsive Layout:** Optimized for 1080p, 2K, 4K monitors.
 
 ## Development & Testing Strategy (The MATE Rule)
 1.  **Mandatory Full Testing:** Comprehensive E2E tests before completion.

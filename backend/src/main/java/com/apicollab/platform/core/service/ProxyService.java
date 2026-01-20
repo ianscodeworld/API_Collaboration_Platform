@@ -54,16 +54,28 @@ public class ProxyService {
         HttpMethod method = HttpMethod.valueOf(request.getMethod().toUpperCase());
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(
+            ResponseEntity<byte[]> response = restTemplate.exchange(
                     request.getUrl(),
                     method,
                     entity,
-                    String.class
+                    byte[].class
             );
 
             ProxyResponse proxyResponse = new ProxyResponse();
             proxyResponse.setStatus(response.getStatusCode().value());
-            proxyResponse.setBody(response.getBody());
+            
+            byte[] bodyBytes = response.getBody();
+            String contentType = response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            
+            if (bodyBytes != null) {
+                if (contentType != null && (contentType.contains("text") || contentType.contains("json") || contentType.contains("xml"))) {
+                    proxyResponse.setBody(new String(bodyBytes));
+                } else {
+                    // Binary data: Encode as Base64 with data URI prefix
+                    String base64 = java.util.Base64.getEncoder().encodeToString(bodyBytes);
+                    proxyResponse.setBody("data:" + (contentType != null ? contentType : "application/octet-stream") + ";base64," + base64);
+                }
+            }
             
             Map<String, String> respHeaders = new java.util.HashMap<>();
             response.getHeaders().forEach((k, v) -> respHeaders.put(k, v.get(0)));
