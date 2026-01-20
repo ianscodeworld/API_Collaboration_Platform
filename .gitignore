@@ -43,6 +43,7 @@ backend/target/
 backend/bin/
 backend/*.log
 backend/*.err
+.mvn/wrapper/maven-wrapper.jar
 
 # Frontend (Node/React/Vite)
 frontend/node_modules/
@@ -52,6 +53,7 @@ frontend/*.local
 frontend/.env*
 frontend/.eslintcache
 frontend/frontend.log
+coverage/
 
 # Mock Server
 mock-oauth2-server/target/
